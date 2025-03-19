@@ -5,7 +5,6 @@ from kubernetes import client, config
 
 # Configuring Flask app
 app = Flask(__name__)
-TOKEN = None
 
 # Load K8s config (if running outside K8s)
 try:
@@ -64,7 +63,6 @@ def get_main_container_image_digest():
 
 # Function to check if there is a newer version of the image in Docker Hub
 def is_newer_image_available(app):
-    global TOKEN
 
     try:
         current_image, current_digest = get_main_container_image_digest()
@@ -77,11 +75,8 @@ def is_newer_image_available(app):
     image_name, current_tag = current_image.split(":")
     _, ns, repo = image_name.split("/")
 
-    if TOKEN is None:
-        TOKEN = get_docker_hub_token()
-
     headers = {
-        "Authorization": f"Bearer {TOKEN}",
+        "Authorization": f"Bearer {get_docker_hub_token()}",
     }
 
     # Docker Hub API to get the tags of the image
